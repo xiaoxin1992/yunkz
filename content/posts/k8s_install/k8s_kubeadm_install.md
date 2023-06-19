@@ -245,6 +245,8 @@ networking:
 # 初始化master节点, 根据提示可加入node节点
 ～$ kubeadm  init -v 5 --config /root/kubeadm.yaml
 ```
+> 如果忘记join节点token可以通过命令重新获取新的token`kubeadm token create --print-join-command`
+
 #### 网络插件安装
 > calico文件下载[github地址](https://github.com/projectcalico/calico/blob/v3.25.1/manifests/calico.yaml)
 ```shell
@@ -253,7 +255,6 @@ networking:
 ~$ mv /etc/cni/net.d/10-containerd-net.conflist  /etc/cni/net.d/10-containerd-net.conflist.old
 ```
 
-> 如果忘记join节点token可以通过命令重新获取新的token`kubeadm token create --print-join-command`
 
 #### 清理集群
 >  执行`kubeadm rest`以后需要在对应的节点执行清理，次命令可以在所有节点执行
