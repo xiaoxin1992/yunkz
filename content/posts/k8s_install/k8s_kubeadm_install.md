@@ -54,7 +54,7 @@ lightgallery: true
 ```shell
 ~$ modprobe br_netfilter
 ```
-#### 配置ulimit参数
+#### 所有机器配置ulimit参数
 ```shell
 ~$ ulimit -SHn 65535
 ```
@@ -67,7 +67,7 @@ lightgallery: true
 	hard nproc 65535
 ```
 
-#### 内核参数配置
+#### 所有机器内核参数配置
 ```shell
 ~$ cat /etc/sysctl.d/k8s.conf
 net.ipv4.ip_forward = 1
@@ -95,7 +95,7 @@ net.ipv4.tcp_timestamps = 0
 net.core.somaxconn = 16384
 ~$ sysctl --system
 ```
-#### IPVS模块安装
+#### 所有机器IPVS模块安装
 ```shell
 ~$ modprobe -- ip_vs
 ~$ modprobe -- ip_vs_rr
@@ -126,17 +126,17 @@ ipt_rpfilter
 ipt_REJECT
 ipip
 ```
-#### 检查模块是否加载
+#### 所有机器检查模块是否加载
 ```shell
 ~$ lsmod |grep -e ip_vs -e nf_conntrack
 ~$ apt install ipset # 安装ipset, ipvsadm 管理工具
 ```
-#### 同步服务器时间
+#### 所有机器同步服务器时间
 ```shell
 ~$ ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime # 配置时区
 ~$ ntpdate time.windows.com
 ```
-#### 关闭swap
+#### 所有机器关闭swap
 ```shell
 ~$ swapoff  -a
 ~$ cat /etc/fstab
@@ -145,24 +145,24 @@ ipip
 ```
 
 ### 容器运行时安装
-#### 依赖包安装
+#### 所有机器依赖包安装
 ```shell
 ~$ apt-get install -y libseccomp2
 ```
 
-#### containerd下载部署
+#### 所有机器containerd下载部署
 ```shell
 ~$ wget https://github.com/containerd/containerd/releases/download/v1.6.18/cri-containerd-cni-1.6.18-linux-amd64.tar.gz
 ~$ tar -tf cri-containerd-cni-1.6.18-linux-amd64.tar.gz # 查看压缩包包含哪些文件
 ~$ tar zxf cri-containerd-cni-1.6.18-linux-amd64.tar.gz -C / # 解压包到跟路径
 ~$ export PATH=$PATH:/opt/cin/bin # 增加环境变量
 ```
-#### 配置文件生成
+#### 所有机器配置文件生成
 ```shell
 ~$ mkdir -p /etc/containerd
 ~$ containerd config default > /etc/containerd/config.toml
 ```
-#### 修改配置文件
+#### 所有机器修改配置文件
 > 配置文件路径`/etc/containerd/config.toml`
 ```yaml
 
@@ -182,12 +182,12 @@ sandbox_image = "registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.6"
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
           endpoint = ["https://registry.aliyuncs.com/k8sxio"]
 ```
-#### 启动containerd服务
+#### 所有机器启动containerd服务
 ```shell
 ~$ systemctl  enable --now containerd
 ```
 ### 开始集群安装
-#### kubeadm安装
+#### 所有机器kubeadm安装
 ```shell
 apt-get update && apt-get install -y apt-transport-https
 curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
@@ -198,15 +198,15 @@ apt-get update
 apt-get install -y kubelet=1.23.13-00 kubeadm=1.23.13-00 kubectl=1.23.13-00
 sudo apt-mark hold kubelet=1.23.13-00 kubeadm=1.23.13-00 kubectl=1.23.13-00 # 锁定版本
 ```
-#### 启动kubelet服务
+#### 所有机启动kubelet服务
 ```shell
 ~$ systemctl enable --now kubelet
 ```
-#### 初始化集群配置文件
+#### master节点初始化集群配置文件
 ```shell
 ~$ kubeadm config print init-defaults --component-configs KubeletConfiguration >/root/kubeadm.yaml
 ```
-#### 修改配置文件
+#### master节点修改配置文件
 > 配置文件路径 `/root/kubeadm.yaml`
 ```yaml
 .....
@@ -245,6 +245,7 @@ networking:
 # 初始化master节点, 根据提示可加入node节点
 ～$ kubeadm  init -v 5 --config /root/kubeadm.yaml
 ```
+> 初始化master节点后，根据kubeadm join提示来完成node节点的加入
 > 如果忘记join节点token可以通过命令重新获取新的token`kubeadm token create --print-join-command`
 
 #### 网络插件安装
