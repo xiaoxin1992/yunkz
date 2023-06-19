@@ -12,6 +12,7 @@ lightgallery: true
 本文使用kubeadm方式来快速部署k8s集群，操作系统基于ubuntu操作系统
 <!--more-->
 
+### 基础配置
 #### IP网段规划
 | IP | 描述 |
 | ------ | ----------- |
